@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
     res.send('Bonjour, Node.js et Express !');
   });
   
-  app.listen(port, () => {
+  app.listen(port, '0.0.0.0', () => {
     console.log(`Le serveur écoute sur le port ${port}`);
   });
 
@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
  ######   ##  ##     ####   ###  ##  #######  ##   ##  #####
 
 */
-
+/*
 const keepass = require('keepass');
 
 const databasePath = 'chemin/vers/votre/base/de/donnees.kdbx';
@@ -72,3 +72,4 @@ keepass.loadFile(databasePath, masterPassword, (err, db) => {
     });
   }
 });
+*/
