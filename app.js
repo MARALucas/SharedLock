@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
  ######   ##  ##     ####   ###  ##  #######  ##   ##  #####
 
 */
-/*
+
 const keepass = require('keepass');
 
 const databasePath = 'chemin/vers/votre/base/de/donnees.kdbx';
@@ -72,4 +72,3 @@ keepass.loadFile(databasePath, masterPassword, (err, db) => {
     });
   }
 });
-*/
