@@ -18,7 +18,9 @@ const cookieParser = require('cookie-parser');
 const argon2Implementation = require('./argon2-implementation.js');
 const kdbxweb = require('kdbxweb');
 const fs = require('fs');
+require('dotenv').config()
 
+/*
 app.use(cookieParser());
 
 app.use(sessions({
@@ -79,7 +81,7 @@ app.get('/register', async (req, res) => {
                         expires: new Date(Date.now() + 365 * 24 * 3600 * 1000),
                         secure: true,
                         httpOnly: true
-                    });*/
+                    });*//*
                     res.redirect("/")
                 } else {
                     res.send('Erreur lors de l\'inscription');
@@ -105,7 +107,7 @@ app.get('/login', async (req, res) => {
             if (err) {
                 /*console.error('Erreur lors de la requête SQL :', err);
                 res.status(500).send('Erreur interne du serveur');
-                return;*/
+                return;*//*
             }
 
             if (result.length === 1) {
@@ -144,7 +146,7 @@ app.post('/logout', (req, res) => {
     res.send('Déconnexion réussie !');
 });
 
-
+*/
 /*
  ###        ##       ####   ###  ##  #######  ##   ##  #####
   ##       ####     ##  ##   ##  ##   ##   #  ###  ##   ## ##
@@ -257,6 +259,7 @@ function generateRandomPassword() {
 // sweet secret
 const databasePath = 'database.kdbx';
 const masterPassword =  process.env.DBPassword;
+
 (async () => {
     try {
         const db = await loadOrCreateDatabase(databasePath, masterPassword);
