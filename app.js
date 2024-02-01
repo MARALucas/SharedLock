@@ -276,7 +276,7 @@ async function getPasswordForUserAndSite(username, site) {
 }
 
 
-
+/*
 // Exemple d'utilisation :
 (async () => {
     try {
@@ -292,4 +292,4 @@ async function getPasswordForUserAndSite(username, site) {
         // Gère les erreurs en journalisant un message d'erreur.
         console.error('Erreur :', error.message);
     }
-})();
+})();*/
