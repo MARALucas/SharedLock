@@ -1,16 +1,17 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const loginContainer = document.querySelector('.login-container');
-    const registerContainer = document.querySelector('.register-container');
+// Vérifier si le cookie existe
+const loggedUser = document.cookie.includes('LOGGED_USER');
 
-    // Vérifier si le cookie LOGGED_USER est présent
-    const isLoggedIn = document.cookie.includes('LOGGED_USER');
+// Sélectionner les éléments des formulaires
+const loginForm = document.querySelector('.login-container');
+const registerForm = document.querySelector('.register-container');
 
-    // Afficher ou masquer les formulaires en fonction de la connexion
-    if (isLoggedIn) {
-        loginContainer.style.display = 'none'; // Masquer le formulaire de connexion
-        registerContainer.style.display = 'none'; // Masquer le formulaire d'inscription
-    } else {
-        loginContainer.style.display = 'block'; // Afficher le formulaire de connexion
-        registerContainer.style.display = 'block'; // Afficher le formulaire d'inscription
-    }
-});
+// Masquer ou afficher les formulaires en fonction de la présence du cookie
+if (loggedUser) {
+    // Masquer les formulaires s'il existe un utilisateur connecté
+    loginForm.style.display = 'none';
+    registerForm.style.display = 'none';
+} else {
+    // Afficher les formulaires s'il n'existe pas d'utilisateur connecté
+    loginForm.style.display = 'block';
+    registerForm.style.display = 'block';
+}
