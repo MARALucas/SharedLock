@@ -14,6 +14,10 @@ const port = 3000;
 const mysql = require('mysql');
 const bcrypt = require('bcrypt');
 const util = require('./util')
+const argon2Implementation = require('./argon2-implementation.js');
+const kdbxweb = require('kdbxweb');
+const fs = require('fs');
+/*
 // const bodyParser = require('body-parser');
 // const cookieParser = require('cookie-parser');
 
@@ -41,9 +45,7 @@ connection.connect((err) => {
 // Utilisation de cookie-parser pour manipuler les cookies
 // app.use(cookieParser());
 
-const argon2Implementation = require('./argon2-implementation.js');
-const kdbxweb = require('kdbxweb');
-const fs = require('fs');
+
 
 app.use(express.static("public"))
 
@@ -130,7 +132,7 @@ app.post('/logout', (req, res) => {
     res.clearCookie('LOGGED_USER');
     res.send('Déconnexion réussie !');
 });
-
+*/
 /*
  ###        ##       ####   ###  ##  #######  ##   ##  #####
   ##       ####     ##  ##   ##  ##   ##   #  ###  ##   ## ##
@@ -142,7 +144,7 @@ app.post('/logout', (req, res) => {
 
 */
 
-/*
+
 // Function to load or create a KeePass database
 async function loadOrCreateDatabase(dbPath, masterPassword) {
     try {
@@ -219,4 +221,3 @@ const masterPassword = 'YourMasterPassword';
     }
 })();
 
-*/
