@@ -12,6 +12,7 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
+const argon2Implementation = require('./argon2-implementation.js');
 const kdbxweb = require('kdbxweb');
 const fs = require('fs');
 
