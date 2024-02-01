@@ -255,7 +255,7 @@ function generateRandomPassword() {
     // For simplicity, you can use a library like 'crypto-random-string'
     return 'GeneratedPassword123';
 }
-
+/*
 // sweet secret
 const databasePath = 'database.kdbx';
 const masterPassword =  process.env.DBPassword;
@@ -271,4 +271,4 @@ const masterPassword =  process.env.DBPassword;
         console.error('Error:', error);
     }
 })();
-
+*/
