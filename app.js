@@ -60,33 +60,13 @@ app.get('/register', async (req, res) => {
     if (["username", "password", "confirmpassword"].every(el => Object.keys(req.query).includes(el))){
         if (req.query.password == req.query.confirmpassword){
             delete req.query['confirmpassword'];
-            const username = req.query.username;
 
-            const hashedPassword = util.hashPassword(req.query.password);
+            if(await util.addUser(connection, req.query)) {
+                return res.redirect("/")
+            }
 
-            const query = 'INSERT INTO users (username, password) VALUES (?, ?)';
-            connection.query(query, [username, hashedPassword], (err, result) => {
-                if (err) {
-                    console.error('Erreur lors de la requête SQL :', err);
-                    res.status(500).send('Erreur interne du serveur');
-                    return;
-                }
-        
-                if (result.affectedRows === 1) {
-                    /*req.session.user = { username: username };
-                    req.sesssion.active = true;
-                    res.cookie('LOGGED_USER', username, {
-                        expires: new Date(Date.now() + 365 * 24 * 3600 * 1000),
-                        secure: true,
-                        httpOnly: true
-                    });*/
-                    res.redirect("/")
-                } else {
-                    res.send('Erreur lors de l\'inscription');
-                }
-            });
         } else {
-            res.redirect("/")
+            return res.redirect("/")
         }
     }
     res.render('index', {active: req.session.active})
@@ -99,50 +79,36 @@ app.get('/login', async (req, res) => {
         const username = req.query.username;
         const password = req.query.password;
 
-        const query = 'SELECT * FROM users WHERE username = ?';
-        connection.query(query, [username], (err, result) => {
-            console.log("ok")
-            if (err) {
-                /*console.error('Erreur lors de la requête SQL :', err);
-                res.status(500).send('Erreur interne du serveur');
-                return;*/
-            }
+        if(util.verify(connection, username, password)) {
+            req.session.user = username;
+            req.session.active = true;
+            console.log(req.session)
+            res.cookie('LOGGED_USER', username, { maxAge: 900000, httpOnly: true });
+            /*res.cookie('LOGGED_USER', username, {
+                expires: new Date(Date.now() + 365 * 24 * 3600 * 1000),
+                secure: true,
+                httpOnly: true
+            });
 
-            if (result.length === 1) {
-                console.log("ok")
-                const user = result[0];
-                if (util.hashPassword(req.query.password) === user.password) {
-                    req.session.user = username;
-                    req.session.active = true;
-                    console.log("ok")
-                    res.cookie('LOGGED_USER', username, {
-                        expires: new Date(Date.now() + 365 * 24 * 3600 * 1000),
-                        secure: true,
-                        httpOnly: true
-                    });
-
-                    if (req.query.forward){
-                        return res.redirect(req.query.forward)
-                    }
-                    else{
-                        return res.redirect('/')
-                    }
-                } else {
-                    return res.redirect('/login?error=true');
-                }
-            } else {
-                res.redirect('/login?error=true');
+            if (req.query.forward){
+                return res.redirect(req.query.forward)
             }
-        });
+            else{
+                return res.redirect('/')
+            }*/
+        }
     }
     res.render("index", {forward: req.query.forward, active: req.session.active})
 });
 
-// Route pour gérer la déconnexion
-app.post('/logout', (req, res) => {
+app.get('/logout',(req, res) => {
+    req.session.destroy()
+    req.session = null
     res.clearCookie('LOGGED_USER');
-    res.send('Déconnexion réussie !');
-});
+
+    delete session
+    res.redirect('/')
+})
 
 
 /*
@@ -153,7 +119,6 @@ app.post('/logout', (req, res) => {
   ##  ##  ######   ##        ## ##    ## #    ##  ###   ##  ##
   ##  ##  ##  ##    ##  ##   ##  ##   ##   #  ##   ##   ## ##
  ######   ##  ##     ####   ###  ##  #######  ##   ##  #####
-
 */
 
 
@@ -268,4 +233,3 @@ const masterPassword =  process.env.DBPassword;
         console.error('Error:', error);
     }
 })();
-

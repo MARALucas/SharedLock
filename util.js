@@ -41,15 +41,44 @@ function hashPassword(password) {
     return pwd.digest().toHex()
 }
 
-async function verify(username, password) {
+async function verify(connection, username, password) {
     password = hashPassword(password)
-    pass = await knex('users').where({ numsecu: numsecu }).select('password').first().catch(err => console.log(err))
-    if (!pass) {
-        return false
-    }
-    return pass.password == password
+    const query = 'SELECT * FROM users WHERE username = ?';
+
+    connection.query(query, [username], (err, result) => {
+        if (err) {
+            /*console.error('Erreur lors de la requête SQL :', err);
+            res.status(500).send('Erreur interne du serveur');
+            return;*/
+            return false
+        }
+
+        if (result.length === 1) {
+            const user = result[0];
+            return util.hashPassword(req.query.password) === user.password
+        } else {
+            return false
+        }
+    });
+}
+
+async function addUser(connection, data) {
+    console.log(data)
+    username = data['username']
+    password = hashPassword(data['password'])
+    const query = 'INSERT INTO users (username, password) VALUES (?, ?)';
+
+    connection.query(query, [username, password], (err, result) => {
+        if (err) {
+            console.error('Erreur lors de la requête SQL :', err);
+            res.status(500).send('Erreur interne du serveur');
+            return false;
+        }
+
+        return result.affectedRows === 1
+    });
 }
 
 module.exports = {
-    hashPassword: hashPassword, validateForm: validateForm
+    hashPassword: hashPassword, validateForm: validateForm, verify: verify, addUser: addUser
 };
