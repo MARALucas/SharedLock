@@ -26,17 +26,17 @@ app.use(cookieParser());
 
 // Configuration de la gestion de sessions avec express-session
 app.use(sessions({
-    secret: '686Q5r-/yv[kVH', 
+    secret: process.env.session_secret, 
     resave: false,
     saveUninitialized: true,
 }));
 
 // Configuration de la connexion à la base de données MySQL
 const connection = mysql.createConnection({
-    host: '127.0.0.1',
-    user: 'user',
-    password: 'user',
-    database: 'test'
+    host: process.env.bdd_host,
+    user: process.env.bdd_user,
+    password: process.env.bdd_password,
+    database: process.env.bdd_database
 });
 
 // Établir la connexion à la base de données
@@ -113,7 +113,7 @@ app.get('/login', async (req, res) => {
             return res.redirect('/')
         }
     }
-    res.render("keepass", {forward: req.query.forward, active: req.session.active})
+    res.render("index", {forward: req.query.forward, active: req.session.active})
 });
 
 // La route pour gérer la déconnexion
