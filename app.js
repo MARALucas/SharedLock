@@ -111,6 +111,13 @@ app.get('/logout',(req, res) => {
     res.redirect('/')
 })
 
+app.get('/keepass', (req, res) => {
+    data = {
+        username: req.session.user,
+        site: req.query.site
+    }
+})
+
 
 /*
  ###        ##       ####   ###  ##  #######  ##   ##  #####

@@ -11,9 +11,8 @@
     
     <div class="container">
         <% if(active){ %>
-            <form class="login-form" action="/logout" method="GET">
-                <button type="submit">Se déconnecter</button>
-            </form>
+            <%- include('keepass') %>
+            <%- include('logout') %>
             <% }else{ %>
                 <%- include('login') %>
                 <%- include('register') %>
