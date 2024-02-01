@@ -167,7 +167,7 @@ app.post('/logout', (req, res) => {
  * @param {string} masterPassword - Le mot de passe principal pour déverrouiller ou créer la base de données.
  * @returns {Promise<Kdbx>} - Une Promise résolvant la base de données KeePass chargée ou nouvellement créée (objet Kdbx).
  * @throws {Error} - Lance une erreur s'il y a un problème lors du chargement ou de la création de la base de données.
- */
+
 async function loadOrCreateDatabase(dbPath, masterPassword) {
     try {
         // Vérifie si le fichier de la base de données existe
@@ -208,7 +208,7 @@ async function loadOrCreateDatabase(dbPath, masterPassword) {
  * @param {string} username - Le nom d'utilisateur associé au mot de passe.
  * @param {string} site - Le site pour lequel le mot de passe est utilisé.
  * @returns {string} - Le mot de passe existant ou nouvellement généré.
- */
+
 function getPassword(db, username, site) {
     const defaultGroup = db.getDefaultGroup();
 
@@ -245,7 +245,7 @@ function getPassword(db, username, site) {
 /**
  * 
  * @returns New pass
- */
+
 function generateRandomPassword() {
     // Your password generation logic here
     // For simplicity, you can use a library like 'crypto-random-string'
@@ -267,3 +267,4 @@ const masterPassword =  process.env.DBPassword;
     }
 })();
 
+*/
