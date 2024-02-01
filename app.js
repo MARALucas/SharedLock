@@ -175,7 +175,11 @@ async function loadOrCreateDatabase(dbPath, masterPassword) {
             console.log(masterPassword);
             console.log(typeof masterPassword);
             // Enregistre la nouvelle base de données au chemin de fichier spécifié
-            const buffer = Buffer.from(await newDb.save());
+            console.log("test0");
+            const test = await newDb.save();
+            console.log("test1");
+            const buffer = Buffer.from(test);
+            console.log("test2");
             await fs.promises.writeFile(dbPath, buffer);
 
 

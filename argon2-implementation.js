@@ -5,7 +5,7 @@ kdbxweb.CryptoEngine.setArgon2Impl(async (password, salt, memory, iterations, le
     try {
         if (!password || !salt) {
             throw new Error('Password or salt is undefined.');
-        }
+        }     
         if (typeof password !== 'string') {
             console.log(typeof password);
             console.log(password);
