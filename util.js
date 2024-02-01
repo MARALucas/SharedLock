@@ -42,7 +42,6 @@ function hashPassword(password) {
 }
 
 async function verify(connection, username, password) {
-    password = hashPassword(password)
     const query = 'SELECT * FROM users WHERE username = ?';
 
     connection.query(query, [username], (err, result) => {
@@ -55,7 +54,9 @@ async function verify(connection, username, password) {
 
         if (result.length === 1) {
             const user = result[0];
-            return util.hashPassword(req.query.password) === user.password
+            if(hashPassword(password) == user.password) {
+                return hashPassword(password) == user.password
+            }
         } else {
             return false
         }
@@ -63,7 +64,6 @@ async function verify(connection, username, password) {
 }
 
 async function addUser(connection, data) {
-    console.log(data)
     username = data['username']
     password = hashPassword(data['password'])
     const query = 'INSERT INTO users (username, password) VALUES (?, ?)';
@@ -75,7 +75,9 @@ async function addUser(connection, data) {
             return false;
         }
 
-        return result.affectedRows === 1
+        if (result.affectedRows === 1) {
+            return true
+        }
     });
 }
 

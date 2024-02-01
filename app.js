@@ -20,7 +20,6 @@ const kdbxweb = require('kdbxweb');
 const fs = require('fs');
 require('dotenv').config()
 
-/*
 // Utiliser le module cookie-parser pour analyser les cookies
 app.use(cookieParser());
 
@@ -73,12 +72,16 @@ app.get('/register', async (req, res) => {
             delete req.query['confirmpassword'];
 
             // Appeler la fonction addUser de l'utilitaire 'util' pour ajouter un utilisateur
-            if (await util.addUser(connection, req.query)) {
+            if (util.addUser(connection, req.query)) {
                 // Rediriger vers la page d'accueil si l'inscription est réussie
+                console.log("Utilisateur ajouté")
                 return res.redirect("/");
+            } else {
+                console.log("error")
             }
         } else {
             // Rediriger vers la page d'accueil si le mot de passe et la confirmation ne correspondent pas
+            console.log("erreur mdp incorrect")
             return res.redirect("/");
         }
     }
@@ -93,26 +96,23 @@ app.get('/login', async (req, res) => {
     if (["username", "password"].every(el => Object.keys(req.query).includes(el))){
         const username = req.query.username;
         const password = req.query.password;
-
+        
         if(util.verify(connection, username, password)) {
             req.session.user = username;
             req.session.active = true;
             res.cookie('LOGGED_USER', username, { maxAge: 900000, httpOnly: true });
-            /*res.cookie('LOGGED_USER', username, {
-                expires: new Date(Date.now() + 365 * 24 * 3600 * 1000),
-                secure: true,
-                httpOnly: true
-            });
             // Rediriger vers la page demandée après la connexion (forward)
-            if (req.query.forward){
+            /*if (req.query.forward){
                 return res.redirect(req.query.forward)
             }
             else{
-                return res.redirect('/')
+                return res.redirect('/keepass')
             }*/
-      /*  }
+        } else {
+            return res.redirect('/')
+        }
     }
-    res.render("index", {forward: req.query.forward, active: req.session.active})
+    res.render("keepass", {forward: req.query.forward, active: req.session.active})
 });
 
 // La route pour gérer la déconnexion
@@ -128,10 +128,8 @@ app.get('/logout',(req, res) => {
 })
 
 app.get('/keepass', (req, res) => {
-    data = {
-        username: req.session.user,
-        site: req.query.site
-    }
+    const pass = getPasswordForUserAndSite(req.session.user, req.query.site)
+
 })
 
 
