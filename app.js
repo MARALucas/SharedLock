@@ -133,6 +133,8 @@ app.post('/logout', (req, res) => {
     res.send('Déconnexion réussie !');
 });
 */
+
+
 /*
  ###        ##       ####   ###  ##  #######  ##   ##  #####
   ##       ####     ##  ##   ##  ##   ##   #  ###  ##   ## ##
@@ -145,17 +147,33 @@ app.post('/logout', (req, res) => {
 */
 
 
-// Function to load or create a KeePass database
+/**
+ *  Charge une base de données KeePass existante depuis le chemin de fichier spécifié
+ *  ou en crée une nouvelle si le fichier n'existe pas.
+ * 
+ * @param {string} dbPath - Le chemin du fichier de la base de données KeePass.
+ * @param {string} masterPassword - Le mot de passe principal pour déverrouiller ou créer la base de données.
+ * @returns {Promise<Kdbx>} - Une Promise résolvant la base de données KeePass chargée ou nouvellement créée (objet Kdbx).
+ * @throws {Error} - Lance une erreur s'il y a un problème lors du chargement ou de la création de la base de données.
+ */
 async function loadOrCreateDatabase(dbPath, masterPassword) {
     try {
+        // Vérifie si le fichier de la base de données existe
         const fileExists = fs.existsSync(dbPath);
+
         if (fileExists) {
+            // Charge la base de données existante si le fichier existe
             const credentials = new kdbxweb.Credentials(kdbxweb.ProtectedValue.fromString(masterPassword));
             return await kdbxweb.Kdbx.load(fs.readFileSync(dbPath), credentials);
         } else {
+            // Crée une nouvelle base de données si le fichier n'existe pas
             const credentials = new kdbxweb.Credentials(kdbxweb.ProtectedValue.fromString(masterPassword));
             const newDb = kdbxweb.Kdbx.create(credentials, 'My KeePass Database');
+
+             // Enregistre la nouvelle base de données au chemin de fichier spécifié
             await fs.promises.writeFile(dbPath, await newDb.save());
+
+            // Retourne la base de données nouvellement créée
             return newDb;
         }
     } catch (error) {
@@ -164,49 +182,60 @@ async function loadOrCreateDatabase(dbPath, masterPassword) {
     }
 }
 
-// Function to check or generate a password for a given username and site
+/**
+ * Vérifie l'existence d'un mot de passe pour un nom d'utilisateur et un site donnés,
+ * et génère un nouveau mot de passe si aucun n'est trouvé.
+ * 
+ * @param {*} db - La base de données KeePass.
+ * @param {string} username - Le nom d'utilisateur associé au mot de passe.
+ * @param {string} site - Le site pour lequel le mot de passe est utilisé.
+ * @returns {string} - Le mot de passe existant ou nouvellement généré.
+ */
 function getPassword(db, username, site) {
     const defaultGroup = db.getDefaultGroup();
 
-    // Check if the subgroup (username) exists
+    // Vérifie si le sous-groupe (username) existe
     let userGroup = defaultGroup.groups.find(group => group.name === username);
     if (!userGroup) {
-        // Create the subgroup if it doesn't exist
+        // Crée le sous-groupe s'il n'existe pas
         userGroup = db.createGroup(defaultGroup, username);
     }
 
-    // Check if the entry (site) exists
+    // Vérifie si l'entrée (site) existe
     let entry = userGroup.entries.find(entry => entry.fields.Site === site);
     if (entry) {
-        // Entry exists, return the password
+        // L'entrée existe, retourne le mot de passe
         return entry.fields.Password.getText();
     } else {
-        // Entry doesn't exist, generate a password
+        // L'entrée n'existe pas, génère un nouveau mot de passe
         const newPassword = generateRandomPassword();
         
-        // Create the entry and set its fields
+        // Crée l'entrée et définit ses champs
         entry = db.createEntry(userGroup);
         entry.fields.Site = site;
         entry.fields.Username = username;
         entry.fields.Password = kdbxweb.ProtectedValue.fromString(newPassword);
 
-        // Save the changes to the database
+        // Enregistre les modifications dans la base de données
         db.save();
 
-        // Return the generated password
+        // Retourne le mot de passe généré
         return newPassword;
     }
 }
 
-// Function to generate a random password
+/**
+ * 
+ * @returns New pass
+ */
 function generateRandomPassword() {
     // Your password generation logic here
     // For simplicity, you can use a library like 'crypto-random-string'
     return 'GeneratedPassword123';
 }
 
-// Example usage
-const databasePath = 'path/to/your/database.kdbx';
+// sweet secret
+const databasePath = 'database.kdbx';
 const masterPassword = 'YourMasterPassword';
 
 (async () => {
