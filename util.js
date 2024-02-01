@@ -81,6 +81,7 @@ async function addUser(connection, data) {
     });
 }
 
+
 module.exports = {
     hashPassword: hashPassword, validateForm: validateForm, verify: verify, addUser: addUser
 };

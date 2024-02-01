@@ -18,6 +18,7 @@ const cookieParser = require('cookie-parser');
 const argon2Implementation = require('./argon2-implementation.js');
 const kdbxweb = require('kdbxweb');
 const fs = require('fs');
+const { Console } = require('console');
 require('dotenv').config()
 
 // Utiliser le module cookie-parser pour analyser les cookies
@@ -158,27 +159,31 @@ async function loadOrCreateDatabase(dbPath, masterPassword) {
         // Vérifie si le fichier de la base de données existe
         const fileExists = fs.existsSync(dbPath);
 
+        console.log('Master Password:', masterPassword);
+        console.log('Master Password Type:', typeof masterPassword);
+
         if (fileExists) {
             // Charge la base de données existante si le fichier existe
+            console.log("Database file exists");
             const credentials = new kdbxweb.Credentials(kdbxweb.ProtectedValue.fromString(masterPassword));
-            return await kdbxweb.Kdbx.load(fs.readFileSync(dbPath), credentials);
+            console.log('Before key derivation');
+            const loadedDb = await kdbxweb.Kdbx.load(fs.readFileSync(dbPath), credentials);
+            console.log('After key derivation');
+            return loadedDb;
         } else {
-            // Crée une nouvelle base de données si le fichier n'existe pas     
+            // Crée une nouvelle base de données si le fichier n'existe pas
+            console.log("Creating a new database");     
             const credentials = new kdbxweb.Credentials(kdbxweb.ProtectedValue.fromString(masterPassword));
-            const newDb = kdbxweb.Kdbx.create(credentials, 'My KeePass Database');
+            const newDb = kdbxweb.Kdbx.create(credentials, 'database');
 
-            console.log(masterPassword);
-            console.log(typeof masterPassword);
             // Enregistre la nouvelle base de données au chemin de fichier spécifié
-            console.log("test0");
-            const test = await newDb.save();
-            console.log("test1");
-            const buffer = Buffer.from(test);
-            console.log("test2");
+            console.log('Before saving new database');
+            const buffer = Buffer.from(await newDb.save());
+            console.log('After saving new database');
+
+            console.log('Before writing new database file');
             await fs.promises.writeFile(dbPath, buffer);
-
-
-            
+            console.log('After writing new database file'); 
 
             // Retourne la base de données nouvellement créée
             return newDb;
@@ -268,8 +273,8 @@ async function getPasswordForUserAndSite(username, site) {
     }
 }
 
-/*
 
+/*
 // Exemple d'utilisation :
 (async () => {
     try {
