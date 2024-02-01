@@ -12,18 +12,22 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const mysql = require('mysql');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 const util = require('./util')
+const sessions = require('express-session');
+const cookieParser = require('cookie-parser');
 const argon2Implementation = require('./argon2-implementation.js');
 const kdbxweb = require('kdbxweb');
-require('dotenv').config() //gestion de secret
 const fs = require('fs');
 
-/*
-// const bodyParser = require('body-parser');
-// const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
-// Configuration de la base de données
+app.use(sessions({
+    secret: '686Q5r-/yv[kVH', 
+    resave: false,
+    saveUninitialized: true,
+}));
+
 const connection = mysql.createConnection({
     host: '127.0.0.1',
     user: 'user',
@@ -31,7 +35,6 @@ const connection = mysql.createConnection({
     database: 'test'
 });
 
-// Connexion à la base de données
 connection.connect((err) => {
     if (err) {
         console.error('Échec de la connexion :', err);
@@ -40,19 +43,12 @@ connection.connect((err) => {
     console.log('Connexion à la base de données réussie');
 });
 
-// Utilisation de body-parser pour récupérer les données POST
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
-
-// Utilisation de cookie-parser pour manipuler les cookies
-// app.use(cookieParser());
-
-
-
-app.use(express.static("public"))
+app.use(express.static("public"));
+app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-    res.send('');
+    req.session.active = false;
+    res.render('index', {active: req.session.active});
   });
   
   app.listen(port, '0.0.0.0', () => {
@@ -64,13 +60,11 @@ app.get('/', (req, res) => {
 app.get('/register', async (req, res) => {
     if (["username", "password", "confirmpassword"].every(el => Object.keys(req.query).includes(el))){
         if (req.query.password == req.query.confirmpassword){
-            delete req.query['confirmpassword']
-            const username = req.query.username
+            delete req.query['confirmpassword'];
+            const username = req.query.username;
 
             //const hashedPassword = bcrypt.hash(req.query.password, 10);
-            const hashedPassword = util.hashPassword(req.query.password)
-            console.log(req.query.password)
-            console.log(hashedPassword)
+            const hashedPassword = util.hashPassword(req.query.password);
 
             const query = 'INSERT INTO users (username, password) VALUES (?, ?)';
             connection.query(query, [username, hashedPassword], (err, result) => {
@@ -81,18 +75,23 @@ app.get('/register', async (req, res) => {
                 }
         
                 if (result.affectedRows === 1) {
+                    /*req.session.user = { username: username };
+                    req.sesssion.active = true;
                     res.cookie('LOGGED_USER', username, {
                         expires: new Date(Date.now() + 365 * 24 * 3600 * 1000),
                         secure: true,
                         httpOnly: true
-                    });
-                    res.send('Inscription réussie !');
+                    });*/
+                    res.redirect("/")
                 } else {
                     res.send('Erreur lors de l\'inscription');
                 }
             });
+        } else {
+            res.redirect("/")
         }
     }
+    res.render('index', {active: req.session.active})
 });
 
 
@@ -104,29 +103,41 @@ app.get('/login', async (req, res) => {
 
         const query = 'SELECT * FROM users WHERE username = ?';
         connection.query(query, [username], (err, result) => {
+            console.log("ok")
             if (err) {
-                console.error('Erreur lors de la requête SQL :', err);
+                /*console.error('Erreur lors de la requête SQL :', err);
                 res.status(500).send('Erreur interne du serveur');
-                return;
+                return;*/
             }
 
             if (result.length === 1) {
+                console.log("ok")
                 const user = result[0];
                 if (util.hashPassword(req.query.password) === user.password) {
+                    req.session.user = username;
+                    req.session.active = true;
+                    console.log("ok")
                     res.cookie('LOGGED_USER', username, {
                         expires: new Date(Date.now() + 365 * 24 * 3600 * 1000),
                         secure: true,
                         httpOnly: true
                     });
-                    res.send('Connexion réussie !');
+
+                    if (req.query.forward){
+                        return res.redirect(req.query.forward)
+                    }
+                    else{
+                        return res.redirect('/')
+                    }
                 } else {
-                    res.send('Mot de passe incorrect !');
+                    return res.redirect('/login?error=true');
                 }
             } else {
-                res.send('Nom d\'utilisateur incorrect !');
+                res.redirect('/login?error=true');
             }
         });
     }
+    res.render("index", {forward: req.query.forward, active: req.session.active})
 });
 
 // Route pour gérer la déconnexion
@@ -134,7 +145,6 @@ app.post('/logout', (req, res) => {
     res.clearCookie('LOGGED_USER');
     res.send('Déconnexion réussie !');
 });
-*/
 
 
 /*
@@ -157,7 +167,7 @@ app.post('/logout', (req, res) => {
  * @param {string} masterPassword - Le mot de passe principal pour déverrouiller ou créer la base de données.
  * @returns {Promise<Kdbx>} - Une Promise résolvant la base de données KeePass chargée ou nouvellement créée (objet Kdbx).
  * @throws {Error} - Lance une erreur s'il y a un problème lors du chargement ou de la création de la base de données.
- */
+
 async function loadOrCreateDatabase(dbPath, masterPassword) {
     try {
         // Vérifie si le fichier de la base de données existe
@@ -202,7 +212,7 @@ async function loadOrCreateDatabase(dbPath, masterPassword) {
  * @param {string} username - Le nom d'utilisateur associé au mot de passe.
  * @param {string} site - Le site pour lequel le mot de passe est utilisé.
  * @returns {string} - Le mot de passe existant ou nouvellement généré.
- */
+
 function getPassword(db, username, site) {
     const defaultGroup = db.getDefaultGroup();
 
@@ -239,7 +249,7 @@ function getPassword(db, username, site) {
 /**
  * 
  * @returns New pass
- */
+
 function generateRandomPassword() {
     // Your password generation logic here
     // For simplicity, you can use a library like 'crypto-random-string'
@@ -261,3 +271,4 @@ const masterPassword =  process.env.DBPassword;
     }
 })();
 
+*/

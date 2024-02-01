@@ -43,6 +43,15 @@ function hashPassword(password) {
     return pwd.digest().toHex()
 }
 
+async function verify(username, password) {
+    password = hashPassword(password)
+    pass = await knex('users').where({ numsecu: numsecu }).select('password').first().catch(err => console.log(err))
+    if (!pass) {
+        return false
+    }
+    return pass.password == password
+}
+
 module.exports = {
     hashPassword: hashPassword, validateForm: validateForm
 };
