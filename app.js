@@ -41,6 +41,7 @@ connection.connect((err) => {
 // Utilisation de cookie-parser pour manipuler les cookies
 // app.use(cookieParser());
 
+const argon2Implementation = require('./argon2-implementation.js');
 const kdbxweb = require('kdbxweb');
 const fs = require('fs');
 
