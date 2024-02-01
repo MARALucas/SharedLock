@@ -12,7 +12,6 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const mysql = require('mysql');
-// const bcrypt = require('bcrypt');
 const util = require('./util')
 const sessions = require('express-session');
 const cookieParser = require('cookie-parser');
@@ -63,7 +62,6 @@ app.get('/register', async (req, res) => {
             delete req.query['confirmpassword'];
             const username = req.query.username;
 
-            //const hashedPassword = bcrypt.hash(req.query.password, 10);
             const hashedPassword = util.hashPassword(req.query.password);
 
             const query = 'INSERT INTO users (username, password) VALUES (?, ?)';
@@ -167,7 +165,7 @@ app.post('/logout', (req, res) => {
  * @param {string} masterPassword - Le mot de passe principal pour déverrouiller ou créer la base de données.
  * @returns {Promise<Kdbx>} - Une Promise résolvant la base de données KeePass chargée ou nouvellement créée (objet Kdbx).
  * @throws {Error} - Lance une erreur s'il y a un problème lors du chargement ou de la création de la base de données.
-
+*/
 async function loadOrCreateDatabase(dbPath, masterPassword) {
     try {
         // Vérifie si le fichier de la base de données existe
@@ -212,7 +210,7 @@ async function loadOrCreateDatabase(dbPath, masterPassword) {
  * @param {string} username - Le nom d'utilisateur associé au mot de passe.
  * @param {string} site - Le site pour lequel le mot de passe est utilisé.
  * @returns {string} - Le mot de passe existant ou nouvellement généré.
-
+*/
 function getPassword(db, username, site) {
     const defaultGroup = db.getDefaultGroup();
 
@@ -249,7 +247,7 @@ function getPassword(db, username, site) {
 /**
  * 
  * @returns New pass
-
+*/
 function generateRandomPassword() {
     // Your password generation logic here
     // For simplicity, you can use a library like 'crypto-random-string'
@@ -271,4 +269,3 @@ const masterPassword =  process.env.DBPassword;
     }
 })();
 
-*/

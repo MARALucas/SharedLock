@@ -1,7 +1,5 @@
 const forge = require('node-forge')
-const bcrypt = require('bcrypt');
 
-//const salt = bcrypt.genSaltSync(10);
 
 function validateForm() {
     var password = document.getElementById('password').value;
