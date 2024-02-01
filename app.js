@@ -16,7 +16,9 @@ const bcrypt = require('bcrypt');
 const util = require('./util')
 const argon2Implementation = require('./argon2-implementation.js');
 const kdbxweb = require('kdbxweb');
+require('dotenv').config() //gestion de secret
 const fs = require('fs');
+
 /*
 // const bodyParser = require('body-parser');
 // const cookieParser = require('cookie-parser');
@@ -236,10 +238,11 @@ function generateRandomPassword() {
 
 // sweet secret
 const databasePath = 'database.kdbx';
-const masterPassword = 'YourMasterPassword';
+const masterPassword =  process.env.DBPassword;
 
 (async () => {
     try {
+        console.log(masterPassword);
         const db = await loadOrCreateDatabase(databasePath, masterPassword);
         const username = 'sampleUser';
         const site = 'example.com';
