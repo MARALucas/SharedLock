@@ -168,12 +168,18 @@ async function loadOrCreateDatabase(dbPath, masterPassword) {
             const credentials = new kdbxweb.Credentials(kdbxweb.ProtectedValue.fromString(masterPassword));
             return await kdbxweb.Kdbx.load(fs.readFileSync(dbPath), credentials);
         } else {
-            // Crée une nouvelle base de données si le fichier n'existe pas
+            // Crée une nouvelle base de données si le fichier n'existe pas     
             const credentials = new kdbxweb.Credentials(kdbxweb.ProtectedValue.fromString(masterPassword));
             const newDb = kdbxweb.Kdbx.create(credentials, 'My KeePass Database');
 
-             // Enregistre la nouvelle base de données au chemin de fichier spécifié
-            await fs.promises.writeFile(dbPath, await newDb.save());
+            console.log(masterPassword);
+            console.log(typeof masterPassword);
+            // Enregistre la nouvelle base de données au chemin de fichier spécifié
+            const buffer = Buffer.from(await newDb.save());
+            await fs.promises.writeFile(dbPath, buffer);
+
+
+            
 
             // Retourne la base de données nouvellement créée
             return newDb;
@@ -239,10 +245,8 @@ function generateRandomPassword() {
 // sweet secret
 const databasePath = 'database.kdbx';
 const masterPassword =  process.env.DBPassword;
-
 (async () => {
     try {
-        console.log(masterPassword);
         const db = await loadOrCreateDatabase(databasePath, masterPassword);
         const username = 'sampleUser';
         const site = 'example.com';

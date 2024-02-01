@@ -1,35 +1,26 @@
-const argon2 = require('argon2-browser');
+const argon2 = require('argon2');
 const kdbxweb = require('kdbxweb');
 
-/** 
- *  Définit l'implémentation Argon2 pour le moteur de chiffrement de kdbxweb en utilisant argon2-browser.
- * 
- * @param {string} password - Le mot de passe à hacher.
- * @param {string} salt - Le sel utilisé pour le hachage.
- * @param {number} memory - La taille de la mémoire à utiliser pour le hachage.
- * @param {number} iterations - Le nombre d'itérations pour le hachage.
- * @param {number} length - La longueur du hash résultant.
- * @param {number} parallelism - Le degré de parallélisme à utiliser pour le hachage.
- * @param {string} type - Le type d'argon à utiliser (d, i ou id).
- * @param {number} version - La version d'Argon2 à utiliser.
- * @returns {Promise<ArrayBuffer>} - Une Promise résolvant avec le hash Argon2 en tant qu'ArrayBuffer.
- * @throws {Error} - Lance une erreur si le mot de passe ou le sel est indéfini, ou s'il y a une erreur lors du hachage.
- */
 kdbxweb.CryptoEngine.setArgon2Impl(async (password, salt, memory, iterations, length, parallelism, type, version) => {
     try {
         if (!password || !salt) {
             throw new Error('Password or salt is undefined.');
         }
+        if (typeof password !== 'string') {
+            console.log(typeof password);
+            console.log(password);
+            throw new Error('Password must be a string.');
+        }
 
         // Convert Uint8Array to ArrayBuffer
         const hash = await argon2.hash({
-            pass: password,
+            pass: password, // Assurez-vous que password est une chaîne de caractères
             salt: salt,
             hashLen: length,
             time: iterations,
             mem: memory,
             parallelism,
-            type: argon2.ArgonType[type],
+            type: argon2[type],
             distPath: 'node_modules/argon2-browser'
         });
 
