@@ -20,15 +20,17 @@ const kdbxweb = require('kdbxweb');
 const fs = require('fs');
 require('dotenv').config()
 
-
+// Utiliser le module cookie-parser pour analyser les cookies
 app.use(cookieParser());
 
+// Configuration de la gestion de sessions avec express-session
 app.use(sessions({
     secret: '686Q5r-/yv[kVH', 
     resave: false,
     saveUninitialized: true,
 }));
 
+// Configuration de la connexion à la base de données MySQL
 const connection = mysql.createConnection({
     host: '127.0.0.1',
     user: 'user',
@@ -36,6 +38,7 @@ const connection = mysql.createConnection({
     database: 'test'
 });
 
+// Établir la connexion à la base de données
 connection.connect((err) => {
     if (err) {
         console.error('Échec de la connexion :', err);
@@ -44,34 +47,43 @@ connection.connect((err) => {
     console.log('Connexion à la base de données réussie');
 });
 
+// Configuration d'Express
 app.use(express.static("public"));
 app.set('view engine', 'ejs');
 
+// Route pour la page d'accueil
 app.get('/', (req, res) => {
     req.session.active = false;
     res.render('index', {active: req.session.active});
   });
   
-  app.listen(port, '0.0.0.0', () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Le serveur écoute sur le port ${port}`);
-  });
+});
 
 
-// Route pour gérer l'inscription
+// La route pour gérer l'inscription
 app.get('/register', async (req, res) => {
-    if (["username", "password", "confirmpassword"].every(el => Object.keys(req.query).includes(el))){
-        if (req.query.password == req.query.confirmpassword){
+    // Vérifier si les champs requis (username, password, confirmpassword) sont présents dans la requête
+    if (["username", "password", "confirmpassword"].every(el => Object.keys(req.query).includes(el))) {
+        // Vérifier si le mot de passe et la confirmation du mot de passe correspondent
+        if (req.query.password == req.query.confirmpassword) {
+            // Supprimer le champ 'confirmpassword' de l'objet req.query
             delete req.query['confirmpassword'];
 
-            if(await util.addUser(connection, req.query)) {
-                return res.redirect("/")
+            // Appeler la fonction addUser de l'utilitaire 'util' pour ajouter un utilisateur
+            if (await util.addUser(connection, req.query)) {
+                // Rediriger vers la page d'accueil si l'inscription est réussie
+                return res.redirect("/");
             }
-
         } else {
-            return res.redirect("/")
+            // Rediriger vers la page d'accueil si le mot de passe et la confirmation ne correspondent pas
+            return res.redirect("/");
         }
     }
-    res.render('index', {active: req.session.active})
+
+    // Rendre la page d'accueil avec une éventuelle indication d'activité de session (req.session.active)
+    res.render('index', { active: req.session.active });
 });
 
 
@@ -90,7 +102,7 @@ app.get('/login', async (req, res) => {
                 secure: true,
                 httpOnly: true
             });
-
+            // Rediriger vers la page demandée après la connexion (forward)
             if (req.query.forward){
                 return res.redirect(req.query.forward)
             }
@@ -102,12 +114,15 @@ app.get('/login', async (req, res) => {
     res.render("index", {forward: req.query.forward, active: req.session.active})
 });
 
+// La route pour gérer la déconnexion
 app.get('/logout',(req, res) => {
-    req.session.destroy()
-    req.session = null
+    // Détruire la session
+    req.session.destroy()  
+    // Définir la session à null
+    req.session = null;
+    // Effacer le cookie associé à l'utilisateur connecté
     res.clearCookie('LOGGED_USER');
-
-    delete session
+    // Rediriger l'utilisateur vers la page d'accueil après la déconnexion
     res.redirect('/')
 })
 
