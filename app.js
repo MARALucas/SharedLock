@@ -20,6 +20,7 @@ const kdbxweb = require('kdbxweb');
 const fs = require('fs');
 require('dotenv').config()
 
+/*
 // Utiliser le module cookie-parser pour analyser les cookies
 app.use(cookieParser());
 
@@ -109,7 +110,7 @@ app.get('/login', async (req, res) => {
             else{
                 return res.redirect('/')
             }*/
-        }
+      /*  }
     }
     res.render("index", {forward: req.query.forward, active: req.session.active})
 });
@@ -125,7 +126,7 @@ app.get('/logout',(req, res) => {
     // Rediriger l'utilisateur vers la page d'accueil après la déconnexion
     res.redirect('/')
 })
-
+*/
 
 /*
  ###        ##       ####   ###  ##  #######  ##   ##  #####
@@ -234,20 +235,49 @@ function generateRandomPassword() {
     // For simplicity, you can use a library like 'crypto-random-string'
     return 'GeneratedPassword123';
 }
-/*
+
 // sweet secret
 const databasePath = 'database.kdbx';
 const masterPassword =  process.env.DBPassword;
 
+/**
+ * Récupère le mot de passe associé à un nom d'utilisateur et un site donnés depuis la base de données.
+ * 
+ * @param {string} username - Le nom d'utilisateur pour lequel récupérer le mot de passe.
+ * @param {string} site - Le site pour lequel récupérer le mot de passe.
+ * @returns {Promise<string>} - Une promesse qui se résout avec le mot de passe, ou est rejetée avec une erreur.
+ */
+async function getPasswordForUserAndSite(username, site) {
+    try {
+        // Charge ou crée la base de données en utilisant le chemin spécifié et le mot de passe principal.
+        const db = await loadOrCreateDatabase(databasePath, masterPassword);
+
+        // Récupère le mot de passe associé au nom d'utilisateur et au site donnés depuis la base de données.
+        const password = getPassword(db, username, site);
+
+        // Retourne le mot de passe récupéré.
+        return password;
+    } catch (error) {
+        // Si une erreur survient pendant le processus, lance une nouvelle erreur avec un message descriptif.
+        throw new Error('Impossible de récupérer le mot de passe : ' + error.message);
+    }
+}
+
+/*
+
+// Exemple d'utilisation :
 (async () => {
     try {
-        const db = await loadOrCreateDatabase(databasePath, masterPassword);
-        const username = 'sampleUser';
-        const site = 'example.com';
-        const password = getPassword(db, username, site);
-        console.log('Password:', password);
+        const username = 'utilisateurExemple';
+        const site = 'exemple.com';
+
+        // Appelle la fonction pour obtenir le mot de passe pour le nom d'utilisateur et le site spécifiés.
+        const password = await getPasswordForUserAndSite(username, site);
+
+        // Journalise le mot de passe récupéré.
+        console.log('Mot de passe :', password);
     } catch (error) {
-        console.error('Error:', error);
+        // Gère les erreurs en journalisant un message d'erreur.
+        console.error('Erreur :', error.message);
     }
-})();
-*/
+})();*/
