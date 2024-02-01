@@ -1,15 +1,11 @@
 const argon2 = require('argon2');
 const kdbxweb = require('kdbxweb');
 
+
 kdbxweb.CryptoEngine.setArgon2Impl(async (password, salt, memory, iterations, length, parallelism, type, version) => {
-    try {
+    try {     
         if (!password || !salt) {
             throw new Error('Password or salt is undefined.');
-        }     
-        if (typeof password !== 'string') {
-            console.log(typeof password);
-            console.log(password);
-            throw new Error('Password must be a string.');
         }
 
         // Convert Uint8Array to ArrayBuffer
@@ -30,7 +26,6 @@ kdbxweb.CryptoEngine.setArgon2Impl(async (password, salt, memory, iterations, le
         // Resolve the promise with the hash
         return Promise.resolve(hashArrayBuffer);
     } catch (error) {
-        // Gérer les erreurs
         console.error('Error hashing with Argon2:', error);
         return Promise.reject(error);
     }

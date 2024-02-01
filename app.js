@@ -18,6 +18,8 @@ const cookieParser = require('cookie-parser');
 const argon2Implementation = require('./argon2-implementation.js');
 const kdbxweb = require('kdbxweb');
 const fs = require('fs');
+require('dotenv').config()
+
 
 app.use(cookieParser());
 
@@ -82,7 +84,6 @@ app.get('/login', async (req, res) => {
         if(util.verify(connection, username, password)) {
             req.session.user = username;
             req.session.active = true;
-            console.log(req.session)
             res.cookie('LOGGED_USER', username, { maxAge: 900000, httpOnly: true });
             /*res.cookie('LOGGED_USER', username, {
                 expires: new Date(Date.now() + 365 * 24 * 3600 * 1000),
@@ -218,10 +219,11 @@ function generateRandomPassword() {
     // For simplicity, you can use a library like 'crypto-random-string'
     return 'GeneratedPassword123';
 }
-
+/*
 // sweet secret
 const databasePath = 'database.kdbx';
 const masterPassword =  process.env.DBPassword;
+
 (async () => {
     try {
         const db = await loadOrCreateDatabase(databasePath, masterPassword);
@@ -233,3 +235,4 @@ const masterPassword =  process.env.DBPassword;
         console.error('Error:', error);
     }
 })();
+*/
