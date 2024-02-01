@@ -126,7 +126,14 @@ app.get('/logout',(req, res) => {
     // Rediriger l'utilisateur vers la page d'accueil après la déconnexion
     res.redirect('/')
 })
-*/
+
+app.get('/keepass', (req, res) => {
+    data = {
+        username: req.session.user,
+        site: req.query.site
+    }
+})
+
 
 /*
  ###        ##       ####   ###  ##  #######  ##   ##  #####
