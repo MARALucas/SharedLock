@@ -107,7 +107,7 @@ app.get('/login', async (req, res) => {
                 return res.redirect(req.query.forward)
             }
             else{
-                return res.redirect('/keepass')
+                return res.redirect('/')
             }*/
         } else {
             return res.redirect('/')
